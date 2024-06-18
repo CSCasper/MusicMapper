@@ -13,4 +13,5 @@
 *.vsix
 
 .cache
+__pycache__
 env_variables.txt

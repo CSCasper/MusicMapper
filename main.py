@@ -1,8 +1,11 @@
 '''Test file for spotipy'''
 
-import json
 import spotipy
+import pprint
 from spotipy.oauth2 import SpotifyOAuth
+
+from dataplay import *
+from node import TrackNode, ArtistNode, GenreNode
 
 SCOPE = "user-library-read,user-follow-read"
 TRACKS_MAX_RANGE = 100
@@ -13,85 +16,49 @@ def main():
     '''
     sp_user = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=SCOPE))
 
-    user_tracks     = get_all_saved_tracks(sp_user, max_range=TRACKS_MAX_RANGE)
-    user_artists    = get_all_artists(user_tracks)
-    artist_profiles = get_artists_by_ids(sp_user, user_artists)
+    user_tracks  = get_all_saved_tracks(sp_user, max_range=TRACKS_MAX_RANGE)
+    user_artists = get_all_artists(user_tracks)
+    
+    user_artists_by_id = get_artists_by_ids(sp_user, user_artists)
 
-    genres = get_all_genres(artist_profiles)
+    track_nodes = []
+    artist_nodes = []
+    
+    for track in user_tracks:
+        track_artists = track['track']['artists']
+        curr_artist_nodes = []
+        for artist in track_artists:
+            curr_artist_id = find_matching_artist(artist['name'], user_artists_by_id)
+            curr_artist_node = ArtistNode(artist['name'],
+                                          create_genre_nodes(curr_artist_id['genres']))
+            artist_nodes.append(curr_artist_node)
+            curr_artist_nodes.append(curr_artist_node)
+        curr_track_node = TrackNode(track['track']['name'], curr_artist_nodes)
+        track_nodes.append(curr_track_node)
 
-    for genre in sorted(genres):
-        print(genre)
+    genre_map = generate_genre_string_map(artist_nodes)
+    pprint.pprint(genre_map)
 
-    print_artists(user_artists)
-    # dump_tracks_to_json(user_tracks)
-    # print_tracks(user_tracks)
+def find_matching_artist(artist_name, artists_by_id):
+    for artist in artists_by_id:
+        if artist_name == artist['name']:
+            return artist
+    raise Exception('artist id not found')
 
-def get_all_genres(artist_profiles):
-    '''
-    TODO
-    '''
-    genres = set()
-    for artist in artist_profiles:
-        for genre in artist['genres']:
-            genres.add(genre)
-    return genres
+def create_genre_nodes(genres):
+    genre_nodes = []
+    for genre in genres:
+        genre_nodes.append(GenreNode(genre))
+    return genre_nodes
 
-def get_artists_by_ids(user, artists):
-    '''
-    TODO
-    '''
-    artist_profiles = []
-    for item in artists:
-        artist_profiles.append(user.artist(item['id']))
-    return artist_profiles
-
-def get_all_saved_tracks(user, limit_step=50, max_range=100):
-    '''
-    Gets a range of songs from the user's saved tracks and appends them to a list 
-    '''
-    tracks = []
-    for offset in range(0, max_range, limit_step):
-        response = user.current_user_saved_tracks(
-            limit=limit_step,
-            offset=offset,
-        )
-        if len(response) == 0:
-            break
-        tracks.extend(response['items'])
-
-    return tracks
-
-def get_all_artists(tracks):
-    '''
-    TODO
-    '''
-    artists = []
-    for track in tracks:
-        for artist in track['track']['artists']:
-            artists.append(artist)
-
-    # Returns a list with no duplicates
-    return [i for n, i in enumerate(artists) if i not in artists[:n]]
-
-def dump_tracks_to_json(tracks):
-    '''
-    TODO
-    '''
-    with open('result.json', 'w' ,encoding='utf-8') as fp:
-        json.dump(tracks, fp, indent=4)
-
-def print_tracks(tracks):
-    '''
-    Print a list of tracks
-    '''
-    for idx, track in enumerate(tracks):
-        print(idx, track['track']['artists'][0]['name'], " – ", track['track']['name'])
-
-def print_artists(artists):
-    '''
-    TODO
-    '''
-    for idx, artist in enumerate(sorted(artists, key=lambda d: d['name'])):
-        print(idx, artist['name'])
-
+def generate_genre_string_map(artist_nodes):
+    genre_map = {}
+    for artist in artist_nodes:
+        for genre in artist.get_genres():
+            if genre.get_name() not in genre_map:
+                genre_map[genre.get_name()] = []
+            if artist not in genre_map[genre.get_name()]:
+                genre_map[genre.get_name()].append(artist.get_name())
+    return genre_map
+            
 main()

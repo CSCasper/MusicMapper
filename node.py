@@ -33,12 +33,11 @@ class Node():
     def get_id(self):
         return self.__id
 
-
 class ArtistNode(Node):
-    def __init__(self):
+    def __init__(self, name="", genres=[]):
         super().__init__()
-        self.__name = ""
-        self.__genres = []
+        self.__name = name
+        self.__genres = genres
         self.color = NodeColors.BLUE
 
     def __str__(self):
@@ -50,10 +49,13 @@ class ArtistNode(Node):
     def get_genres(self):
         return self.__genres
 
+    def add_genres(self, genres):
+        return self.__genres.extend(genres)
+
 class GenreNode(Node):
-    def __init__(self):
+    def __init__(self, name=""):
         super().__init__()
-        self.__name = ""
+        self.__name = name
         self.color = NodeColors.YELLOW
 
     def __str__(self):
@@ -62,12 +64,12 @@ class GenreNode(Node):
     def get_name(self):
         return self.__name
 
-
-class SongNode(Node):
-    def __init__(self):
+class TrackNode(Node):
+    def __init__(self, title="", artists=[]):
         super().__init__()
-        self.__title = ""
-        self.__artists = []
+        self.__title = title
+        self.__artists = artists
+        self.color = NodeColors.INDIGO
 
     def __str__(self):
-        return f"{self.__title} - {self.__artists}"
+        return f"{self.__title} | {', '.join(f'{x.get_name()}' for x in self.__artists)}"
