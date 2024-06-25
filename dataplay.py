@@ -1,4 +1,8 @@
 import json
+import time
+from requests import ReadTimeout
+
+MAX_REQUEST_ATTEMPTS = 5
 
 def get_all_genres(artist_profiles):
     '''
@@ -16,10 +20,18 @@ def get_artists_by_ids(user, artists):
     '''
     artist_profiles = []
     for item in artists:
-        artist_profiles.append(user.artist(item['id']))
+        artist = request_artist_from_api(user, (item['id']))
+        if artist is not None:
+            artist_profiles.append(artist)
     return artist_profiles
 
-def get_all_saved_tracks(user, limit_step=50, max_range=100):
+def request_artist_from_api(user, artist_id):
+    try:
+        return user.artist(artist_id)
+    except ReadTimeout as e:
+        print(f"artist id: {artist_id} | {e}")
+
+def get_all_saved_tracks(user, limit_step=10, max_range=100):
     '''
     Gets a range of songs from the user's saved tracks and appends them to a list 
     '''
@@ -47,23 +59,12 @@ def get_all_artists(tracks):
     # Returns a list with no duplicates
     return [i for n, i in enumerate(artists) if i not in artists[:n]]
 
-def dump_tracks_to_json(tracks):
-    '''
-    TODO
-    '''
-    with open('result.json', 'w' ,encoding='utf-8') as fp:
-        json.dump(tracks, fp, indent=4)
-
-def print_tracks(tracks):
-    '''
-    Print a list of tracks
-    '''
-    for idx, track in enumerate(tracks):
-        print(idx, track['track']['artists'][0]['name'], " – ", track['track']['name'])
-
-def print_artists(artists):
-    '''
-    TODO
-    '''
-    for idx, artist in enumerate(sorted(artists, key=lambda d: d['name'])):
-        print(idx, artist['name'])
+def generate_genre_string_map(artist_nodes):
+    genre_map = {}
+    for artist in artist_nodes:
+        for genre in artist.get_genres():
+            if genre.get_name() not in genre_map:
+                genre_map[genre.get_name()] = []
+            if artist.get_name() not in genre_map[genre.get_name()]:
+                genre_map[genre.get_name()].append(artist.get_name())
+    return genre_map
