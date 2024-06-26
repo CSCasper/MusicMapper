@@ -96,14 +96,6 @@ class Node():
         if node in self.__connected_nodes:
             self.__connected_nodes.remove(node)
 
-    def get_id(self):
-        """Return the Node id
-
-        Returns:
-            int: Unique ID for the node
-        """
-        return self.__id
-
 class ArtistNode(Node):
     """Creates an MusicMap Artist node
 
