@@ -13,5 +13,7 @@
 *.vsix
 
 .cache
-__pycache__
+__pycache__/
+data/
+data/mock_data/
 env_variables.txt

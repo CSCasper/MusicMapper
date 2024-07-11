@@ -27,12 +27,12 @@ class Node():
     Returns:
         Node: basic MusicMap node
     """
-    __id_index = 0
+    _id_index = 0
 
     def __init__(self):
-        Node.__id_index += 1
-        self.__id = Node.__id_index
-        self.__connected_nodes = []
+        Node._id_index += 1
+        self._id = Node._id_index
+        self._connected_nodes = []
         self.color = NodeColors.GRAY
 
     def get_id(self):
@@ -41,7 +41,7 @@ class Node():
         Returns:
             int: id
         """
-        return self.__id
+        return self._id
 
     def get_connections(self):
         """Returns a copy of the list of nodes which have a connection to this node
@@ -49,7 +49,7 @@ class Node():
         Returns:
             List: connections to other nodes
         """
-        return self.__connected_nodes.copy()
+        return self._connected_nodes.copy()
 
     def is_connected(self, node):
         """Returns whether or not node is the connected node list
@@ -63,7 +63,7 @@ class Node():
         Raises:
             TypeError: invalid type
         """
-        return node in self.__connected_nodes
+        return node in self._connected_nodes
 
     def add_connection(self, node):
         """Adds a node to the connection list if it doesn't already exist in the collection
@@ -79,7 +79,7 @@ class Node():
             raise TypeError
 
         if not self.is_connected(node):
-            self.__connected_nodes.append(node)
+            self._connected_nodes.append(node)
         if not node.is_connected(self):
             node.add_connection(self)
         print(f"Node ({type(self).__name__}) {self.get_id()} -> \
@@ -93,8 +93,8 @@ class Node():
         """
         if not isinstance(node, Node):
             raise TypeError
-        if node in self.__connected_nodes:
-            self.__connected_nodes.remove(node)
+        if node in self._connected_nodes:
+            self._connected_nodes.remove(node)
 
 class ArtistNode(Node):
     """Creates an MusicMap Artist node
