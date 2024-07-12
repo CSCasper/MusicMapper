@@ -1,9 +1,5 @@
 from enum import Enum
 
-SIMPLE_GENRES = ["rock", "rap", "trap", "step", "ambient",
-                 "soul", "pop", "house", "dnb"]
-
-
 class NodeColors(Enum):
     """Color options for a Node
 
@@ -27,21 +23,10 @@ class Node():
     Returns:
         Node: basic MusicMap node
     """
-    _id_index = 0
 
     def __init__(self):
-        Node._id_index += 1
-        self._id = Node._id_index
         self._connected_nodes = []
         self.color = NodeColors.GRAY
-
-    def get_id(self):
-        """Returns Node id
-
-        Returns:
-            int: id
-        """
-        return self._id
 
     def get_connections(self):
         """Returns a copy of the list of nodes which have a connection to this node
@@ -82,8 +67,6 @@ class Node():
             self._connected_nodes.append(node)
         if not node.is_connected(self):
             node.add_connection(self)
-        print(f"Node ({type(self).__name__}) {self.get_id()} -> \
-            Node ({str(type(node).__name__)}) {node.get_id()}")
 
     def remove_connection(self, node):
         """Removes a connection from a node if it exists
@@ -96,19 +79,82 @@ class Node():
         if node in self._connected_nodes:
             self._connected_nodes.remove(node)
 
+class TrackNode(Node):
+    """Creates a MusicMap Track node
+    
+    Args:
+        Node (Node): Inherited Node class
+    """
+    def __init__(self, title="", artists=None, id=""):
+        super().__init__()
+        self._id = id
+        self._title = title
+        self._artists = artists if artists else []
+        self.color = NodeColors.INDIGO
+
+    def __str__(self):
+        return f"{self._title} | {', '.join(f'{x.get_name()}' for x in self._artists)}"
+
+    def get_artists(self):
+        """Returns a list of artists on the track
+
+        Returns:
+            List: list of artist nodes 
+        """
+        return self._artists.copy()
+
+    def add_artists(self, *artists):
+        """Adds valid artist nodes to the track
+
+        Returns:
+            List: genre nodes that were successfully added
+        """
+        added_artists = [artist for artist in artists if isinstance(artist, ArtistNode)]
+        for artist in added_artists:
+            self.add_connection(artist)
+        self._artists.extend(added_artists)
+        return added_artists.copy()
+
+    def get_title(self):
+        """Get the title of the track
+
+        Returns:
+            str: track title
+        """
+        return self._title
+
+    def set_title(self, title):
+        """Set the title of the track
+
+        Args:
+            title (str): title to set
+
+        Raises:
+            TypeError: invalid type
+        """
+        if not isinstance(title, str):
+            raise TypeError
+        self._title = title
+
 class ArtistNode(Node):
     """Creates an MusicMap Artist node
 
     Args:
         Node (Node): Inherited Node class
     """
-    def __init__(self, name="", genres=None):
+    def __init__(self, name="", genres=None, id=""):
         super().__init__()
+        self._id = id
         self._name = name
         self._genres = genres if genres else []
         self.color = NodeColors.BLUE
 
     def __str__(self):
+        """Returns a string representation of the MapperNode object.
+
+        Returns:
+            str: The name of the MapperNode.
+        """
         return f"{self._name}"
 
     def get_name(self):
@@ -186,59 +232,3 @@ class GenreNode(Node):
         if not isinstance(name, str):
             raise TypeError
         self._name = name
-
-class TrackNode(Node):
-    """Creates a MusicMap Track node
-    
-    Args:
-        Node (Node): Inherited Node class
-    """
-    def __init__(self, title="", artists=None):
-        super().__init__()
-        self._title = title
-        self._artists = artists if artists else []
-        self.color = NodeColors.INDIGO
-
-    def __str__(self):
-        return f"{self._title} | {', '.join(f'{x.get_name()}' for x in self._artists)}"
-
-    def get_artists(self):
-        """Returns a list of artists on the track
-
-        Returns:
-            List: list of artist nodes 
-        """
-        return self._artists.copy()
-
-    def add_artists(self, *artists):
-        """Adds valid artist nodes to the track
-
-        Returns:
-            List: genre nodes that were successfully added
-        """
-        added_artists = [artist for artist in artists if isinstance(artist, ArtistNode)]
-        for artist in added_artists:
-            self.add_connection(artist)
-        self._artists.extend(added_artists)
-        return added_artists.copy()
-
-    def get_title(self):
-        """Get the title of the track
-
-        Returns:
-            str: track title
-        """
-        return self._title
-
-    def set_title(self, title):
-        """Set the title of the track
-
-        Args:
-            title (str): title to set
-
-        Raises:
-            TypeError: invalid type
-        """
-        if not isinstance(title, str):
-            raise TypeError
-        self._title = title
