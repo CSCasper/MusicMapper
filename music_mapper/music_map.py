@@ -1,5 +1,6 @@
-from MapperNodes import track_data, artist_data
-from MapperNodes.mapper_node import TrackNode, ArtistNode, GenreNode
+from music_mapper.mapper_nodes import artist_data
+from music_mapper.mapper_nodes.mapper_node import TrackNode, ArtistNode, GenreNode
+from music_mapper.mapper_nodes import track_data
 
 class MusicMap():
     

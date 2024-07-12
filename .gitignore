@@ -2,7 +2,7 @@
 !.vscode/settings.json
 !.vscode/tasks.json
 .vscode/launch.json
-!.vscode/extensions.json
+.vscode/extensions.json
 !.vscode/*.code-snippets
 
 
@@ -14,7 +14,11 @@
 
 .venv/
 .cache
+
 __pycache__/
 data/
 data/mock_data/
+
 env_variables.txt
+
+*.prof
