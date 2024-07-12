@@ -1,5 +1,5 @@
 import json
-from artist_data import *
+from MusicMapper.artist_data import *
 
 class ArtistFactory:
     def create_object(self, data):

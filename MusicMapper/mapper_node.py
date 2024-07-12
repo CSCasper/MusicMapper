@@ -104,12 +104,12 @@ class ArtistNode(Node):
     """
     def __init__(self, name="", genres=None):
         super().__init__()
-        self.__name = name
-        self.__genres = genres if genres else []
+        self._name = name
+        self._genres = genres if genres else []
         self.color = NodeColors.BLUE
 
     def __str__(self):
-        return f"{self.__name}"
+        return f"{self._name}"
 
     def get_name(self):
         """Return the name of the artist
@@ -117,7 +117,7 @@ class ArtistNode(Node):
         Returns:
             string: artist name
         """
-        return self.__name
+        return self._name
   
     def set_name(self, name):
         """Sets the name of the artist
@@ -130,7 +130,7 @@ class ArtistNode(Node):
         """
         if not isinstance(name, str):
             raise TypeError
-        self.__name = name
+        self._name = name
 
     def get_genres(self):
         """Return a list of genres that belong to the artist
@@ -138,7 +138,7 @@ class ArtistNode(Node):
         Returns:
             List: list of genre nodes
         """
-        return self.__genres.copy()
+        return self._genres.copy()
 
     def add_genres(self, *genres):
         """Adds valid genres to the artist
@@ -149,7 +149,7 @@ class ArtistNode(Node):
         added_genres = [genre for genre in genres if isinstance(genre, GenreNode)]
         for genre in added_genres:
             self.add_connection(genre)
-        self.__genres.extend(added_genres)
+        self._genres.extend(added_genres)
         return added_genres.copy()
 
 class GenreNode(Node):
@@ -160,11 +160,11 @@ class GenreNode(Node):
     """
     def __init__(self, name=""):
         super().__init__()
-        self.__name = name
+        self._name = name
         self.color = NodeColors.YELLOW
 
     def __str__(self):
-        return f"{self.__name}"
+        return f"{self._name}"
 
     def get_name(self):
         """Get the name of the genre
@@ -172,7 +172,7 @@ class GenreNode(Node):
         Returns:
             str: genre name
         """
-        return self.__name
+        return self._name
     
     def set_name(self, name):
         """Set the name of the genre
@@ -185,7 +185,7 @@ class GenreNode(Node):
         """
         if not isinstance(name, str):
             raise TypeError
-        self.__name = name
+        self._name = name
 
 class TrackNode(Node):
     """Creates a MusicMap Track node
@@ -195,12 +195,12 @@ class TrackNode(Node):
     """
     def __init__(self, title="", artists=None):
         super().__init__()
-        self.__title = title
-        self.__artists = artists if artists else []
+        self._title = title
+        self._artists = artists if artists else []
         self.color = NodeColors.INDIGO
 
     def __str__(self):
-        return f"{self.__title} | {', '.join(f'{x.get_name()}' for x in self.__artists)}"
+        return f"{self._title} | {', '.join(f'{x.get_name()}' for x in self._artists)}"
 
     def get_artists(self):
         """Returns a list of artists on the track
@@ -208,7 +208,7 @@ class TrackNode(Node):
         Returns:
             List: list of artist nodes 
         """
-        return self.__artists.copy()
+        return self._artists.copy()
 
     def add_artists(self, *artists):
         """Adds valid artist nodes to the track
@@ -219,7 +219,7 @@ class TrackNode(Node):
         added_artists = [artist for artist in artists if isinstance(artist, ArtistNode)]
         for artist in added_artists:
             self.add_connection(artist)
-        self.__artists.extend(added_artists)
+        self._artists.extend(added_artists)
         return added_artists.copy()
 
     def get_title(self):
@@ -228,7 +228,7 @@ class TrackNode(Node):
         Returns:
             str: track title
         """
-        return self.__title
+        return self._title
 
     def set_title(self, title):
         """Set the title of the track
@@ -241,4 +241,4 @@ class TrackNode(Node):
         """
         if not isinstance(title, str):
             raise TypeError
-        self.__title = title
+        self._title = title
