@@ -1,3 +1,4 @@
+import json
 from enum import Enum
 
 class NodeColors(Enum):
@@ -24,9 +25,14 @@ class Node():
         Node: basic MusicMap node
     """
 
-    def __init__(self):
+    def __init__(self, id="", data=None):
         self._connected_nodes = []
+        self._id = id
+        self._data = data
         self.color = NodeColors.GRAY
+        
+    def get_id(self):
+        return self._id
 
     def get_connections(self):
         """Returns a copy of the list of nodes which have a connection to this node
@@ -78,6 +84,33 @@ class Node():
             raise TypeError
         if node in self._connected_nodes:
             self._connected_nodes.remove(node)
+    
+    def to_dict(self):
+        """Returns a dictionary representation of the node
+
+        Returns:
+            dict: dictionary representation of the node
+        """
+        return {
+            "Connections": self.get_connection_ids(),
+            "Data": self._data
+        }
+        
+    def to_json(self):
+        """Returns a JSON representation of the node
+
+        Returns:
+            str: JSON representation of the node
+        """
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+    
+    def get_connection_ids(self):
+        """Returns a list of connection ids
+
+        Returns:
+            List: list of connection ids
+        """
+        return [node.get_id() for node in self._connected_nodes]
 
 class TrackNode(Node):
     """Creates a MusicMap Track node
@@ -85,9 +118,8 @@ class TrackNode(Node):
     Args:
         Node (Node): Inherited Node class
     """
-    def __init__(self, title="", artists=None, id=""):
-        super().__init__()
-        self._id = id
+    def __init__(self, title="", artists=None, id="", data=None):
+        super().__init__(id, data)
         self._title = title
         self._artists = artists if artists else []
         self.color = NodeColors.INDIGO
@@ -142,9 +174,8 @@ class ArtistNode(Node):
     Args:
         Node (Node): Inherited Node class
     """
-    def __init__(self, name="", genres=None, id=""):
-        super().__init__()
-        self._id = id
+    def __init__(self, name="", genres=None, id="", data=None):
+        super().__init__(id, data)
         self._name = name
         self._genres = genres if genres else []
         self.color = NodeColors.BLUE
@@ -204,8 +235,8 @@ class GenreNode(Node):
     Args:
         Node (Node): Inherited Node class
     """
-    def __init__(self, name=""):
-        super().__init__()
+    def __init__(self, name="", id=""):
+        super().__init__(id, None)
         self._name = name
         self.color = NodeColors.YELLOW
 
