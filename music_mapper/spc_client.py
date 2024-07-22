@@ -1,5 +1,6 @@
 from spotipy.oauth2 import SpotifyOAuth 
 from spotipy import Spotify
+import time
 
 SCOPE = "user-library-read, user-follow-read"
 
@@ -11,16 +12,34 @@ class SPClient():
         '''
         Gets a range of songs from the user's saved tracks and appends them to a list 
         '''
+        # TODO simplify or omit variables
+        # TODO fix max_tracks so it is exact
+        # TOOD add feature to get all tracks elegantly
         tracks = []
-        offset, limit = 0, 50
+        track_data = []
+        known_artist_profiles = {}
+        offset = 0
+        
+        limit = 50 if max_tracks > 50 else max_tracks
+        
         while offset <= max_tracks:
             response = self._sp_user.current_user_saved_tracks(limit=limit, offset=offset)
             if len(response) == 0:
                 break
-            for item in response['items']:
-                artists = self._get_artists_by_ids([artist['id'] for artist in item['track']['artists']])
-                tracks.append((item['track'], artists))
+            track_data += response['items']
             offset += limit
+            
+        for item in track_data:
+            for artist in item['track']['artists']:
+                if artist['id'] not in known_artist_profiles:
+                    known_artist_profiles[artist['id']] = None
+        
+        artists = self._get_artists_by_ids(list(known_artist_profiles.keys()))
+        
+        for track in track_data:
+            track_artists = [artists[artist['id']] for artist in track['track']['artists']]
+            tracks.append((track['track'], track_artists))
+        
         return tracks
     
     def _get_all_artists_from_tracks(self, tracks):
@@ -35,9 +54,11 @@ class SPClient():
     
     def _get_artists_by_ids(self, artist_ids):
         artists = []
-        if len(artist_ids) <= 50:
-            return self._sp_user.artists([id for id in artist_ids])['artists']
-        while len(artist_ids) > 50:
-            artists += self._sp_user.artists([id for id in artist_ids[:50]])['artists']
-            artist_ids = artist_ids[50:]
-        return artists
+        ids = artist_ids.copy()
+        if len(ids) <= 50:
+            artists = self._sp_user.artists([id for id in ids])['artists']    
+        else:  
+            while len(ids) > 0:
+                artists += self._sp_user.artists([id for id in ids[:50]])['artists']
+                ids = ids[50:]
+        return dict(zip(artist_ids, artists))

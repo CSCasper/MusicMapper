@@ -8,7 +8,7 @@ def main():
     spc = SPClient()
     map = MusicMap()
 
-    map.add_tracks(spc.get_user_saved_tracks(TRACKS_MAX_RANGE))
+    map.add_tracks(spc.get_user_saved_tracks(TRACKS_MAX_RANGE), True)
     
     now = datetime.now().strftime("%m%d%y-%H%M%S")
     

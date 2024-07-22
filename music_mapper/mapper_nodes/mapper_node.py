@@ -25,8 +25,9 @@ class Node():
         Node: basic MusicMap node
     """
 
-    def __init__(self, id="", data=None):
+    def __init__(self, id="", tag="", data=None):
         self._connected_nodes = []
+        self.tag = tag
         self._id = id
         self._data = data
         self.color = NodeColors.GRAY
@@ -110,7 +111,7 @@ class Node():
         Returns:
             List: list of connection ids
         """
-        return [node.get_id() for node in self._connected_nodes]
+        return [f"{node.tag}_{node.get_id()}" for node in self._connected_nodes]
 
 class TrackNode(Node):
     """Creates a MusicMap Track node
@@ -119,7 +120,7 @@ class TrackNode(Node):
         Node (Node): Inherited Node class
     """
     def __init__(self, title="", artists=None, id="", data=None):
-        super().__init__(id, data)
+        super().__init__(id, "Track", data)
         self._title = title
         self._artists = artists if artists else []
         self.color = NodeColors.INDIGO
@@ -146,6 +147,17 @@ class TrackNode(Node):
             self.add_connection(artist)
         self._artists.extend(added_artists)
         return added_artists.copy()
+    
+    def has_artist(self, artist_id):
+        """Returns whether or not the artist is on the track
+
+        Args:
+            artist_id (str): artist id
+
+        Returns:
+            bool: True - Artist is on track | False - Artist is not on track
+        """
+        return artist_id in [artist.id for artist in self._artists]
 
     def get_title(self):
         """Get the title of the track
@@ -175,7 +187,7 @@ class ArtistNode(Node):
         Node (Node): Inherited Node class
     """
     def __init__(self, name="", genres=None, id="", data=None):
-        super().__init__(id, data)
+        super().__init__(id, "Artist", data)
         self._name = name
         self._genres = genres if genres else []
         self.color = NodeColors.BLUE
@@ -236,7 +248,7 @@ class GenreNode(Node):
         Node (Node): Inherited Node class
     """
     def __init__(self, name="", id=""):
-        super().__init__(id, None)
+        super().__init__(id, "Genre", None)
         self._name = name
         self.color = NodeColors.YELLOW
 

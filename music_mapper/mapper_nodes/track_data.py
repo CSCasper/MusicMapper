@@ -49,10 +49,9 @@ class Artist:
 
 
 class Album:
-    def __init__(self, album_type: str, total_tracks: int, available_markets: List[str], external_urls: ExternalURL, href: str, id: str, images: List[Image], name: str, release_date: str, release_date_precision: str, restrictions: Dict[str, Any], type: str, uri: str, artists: List[Artist]):
+    def __init__(self, album_type: str, total_tracks: int, external_urls: ExternalURL, href: str, id: str, images: List[Image], name: str, release_date: str, release_date_precision: str, restrictions: Dict[str, Any], type: str, uri: str, artists: List[Artist]):
         self.album_type = album_type
         self.total_tracks = total_tracks
-        self.available_markets = available_markets
         self.external_urls = external_urls
         self.href = href
         self.id = id
@@ -70,7 +69,8 @@ class Album:
         return cls(
             album_type=data["album_type"],
             total_tracks=data["total_tracks"],
-            available_markets=data["available_markets"],
+            # makes the JSON file annoying, can re-add if needed. Update constructor as well.
+            # available_markets=data["available_markets"],
             external_urls=ExternalURL.from_dict(data["external_urls"]),
             href=data["href"],
             id=data["id"],
@@ -86,10 +86,9 @@ class Album:
 
 
 class Track:
-    def __init__(self, album: Album, artists: List[Artist], available_markets: List[str], disc_number: int, duration_ms: int, explicit: bool, external_ids: Dict[str, str], external_urls: ExternalURL, href: str, id: str, linked_from: Dict[str, Any], restrictions: Dict[str, Any], name: str, popularity: int, preview_url: str, track_number: int, type: str, uri: str, is_local: bool):
+    def __init__(self, album: Album, artists: List[Artist], disc_number: int, duration_ms: int, explicit: bool, external_ids: Dict[str, str], external_urls: ExternalURL, href: str, id: str, linked_from: Dict[str, Any], restrictions: Dict[str, Any], name: str, popularity: int, preview_url: str, track_number: int, type: str, uri: str, is_local: bool):
         self.album = album
         self.artists = artists
-        self.available_markets = available_markets
         self.disc_number = disc_number
         self.duration_ms = duration_ms
         self.explicit = explicit
@@ -112,7 +111,8 @@ class Track:
         return cls(
             album=Album.from_dict(data["album"]),
             artists=[Artist.from_dict(artist) for artist in data["artists"]],
-            available_markets=data["available_markets"],
+            # makes the JSON file annoying, can re-add if needed. Update constructor as well.
+            # available_markets=data["available_markets"],
             disc_number=data["disc_number"],
             duration_ms=data["duration_ms"],
             explicit=data["explicit"],
